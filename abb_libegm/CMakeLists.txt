@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(abb_libegm)
 
-find_package(catkin REQUIRED)
-
 find_package(Boost REQUIRED COMPONENTS system thread)
 
 #############################
@@ -27,22 +25,6 @@ if (NOT QUIET)
 endif()
 protobuf_generate_cpp(EgmProtoSources EgmProtoHeaders ${EgmProtoFiles})
 
-###################################
-## catkin specific configuration ##
-###################################
-catkin_package(
-  INCLUDE_DIRS
-    include
-  LIBRARIES
-    ${PROJECT_NAME}
-  CFG_EXTRAS
-    # this exports pthread dependency for us
-    abb_libegm-extras.cmake
-  DEPENDS
-    Boost
-    PROTOBUF
-)
-
 ###########
 ## Build ##
 ###########
@@ -60,25 +42,26 @@ set(SRC_FILES
 include_directories(include
                     ${CMAKE_CURRENT_BINARY_DIR} # Contains protobuf generated sources
                     ${Boost_INCLUDE_DIRS}
-                    ${PROTOBUF_INCLUDE_DIRS}
-                    ${catkin_INCLUDE_DIRS})
+                    ${PROTOBUF_INCLUDE_DIRS})
 
 add_library(${PROJECT_NAME} ${SRC_FILES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES})
 
 #############
 ## Install ##
 #############
+include(GNUInstallDirs)
+
 install(TARGETS ${PROJECT_NAME}
-        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 install(DIRECTORY include/${PROJECT_NAME}/
-        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/abb_libegm
         FILES_MATCHING PATTERN "*.h")
 
 install(FILES ${EgmProtoHeaders}
-        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/abb_libegm)
 
 install(FILES ${EgmProtoFiles}
-        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/abb_libegm)
